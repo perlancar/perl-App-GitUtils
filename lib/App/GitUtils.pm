@@ -12,43 +12,14 @@ use File::chdir;
 
 our %SPEC;
 
-our $_complete_program = sub {
-    require Complete::Util;
-    require List::MoreUtils;
-
+our $_complete_hook = sub {
     my %args = @_;
 
     my $word = $args{word} // '';
-    my $completion;
-    my $is_path;
-
-    # combine all executables (including dirs) and programs in PATH
-    my $c1 = Complete::Util::complete_file(
-        word   => $word,
-        filter => sub { -x $_[0] },
-        #ci    => 1, # convenience, not yet supported by C::U
-    );
-    my $c2 = Complete::Util::complete_program(
-        word => $word,
-        ci   => 1, # convenience
-    );
-
-    {
-        completion => [ List::MoreUtils::uniq(sort(@$c1, @$c2)) ],
-        is_path    => 1,
-    };
+    my $res = list_hooks();
+    return [] unless $res->[0] == 200;
+    return $res->[2];
 };
-
-sub _search_program {
-    require File::Which;
-
-    my $prog = shift;
-    if ($prog =~ m!/!) {
-        return $prog;
-    } else {
-        return File::Which::which($prog) // $prog;
-    }
-}
 
 sub _search_git_dir {
     my $orig_wd = getcwd;
@@ -107,12 +78,22 @@ sub list_hooks {
 $SPEC{run_hook} = {
     v => 1.1,
     summary => 'Run a hook',
+    description => <<'_',
+
+Basically the same as:
+
+    % .git/hooks/<hook-name>
+
+except can be done anywhere inside git repo and provides tab completion.
+
+_
     args => {
         name => {
             summary => 'Hook name, e.g. post-commit',
             schema => ['str*', match => '\A[A-Za-z0-9-]+\z'],
             req => 1,
             pos => 0,
+            completion => $_complete_hook,
         },
     },
 };
@@ -130,12 +111,12 @@ sub run_hook {
 
     local $CWD = "$git_dir/..";
     exec ".git/hooks/$name";
-    [200]; # unreached
+    #[200]; # unreached
 }
 
 $SPEC{post_commit} = {
     v => 1.1,
-    summary => 'Run a hook',
+    summary => 'Run post-commit hook',
     description => <<'_',
 
 Basically the same as:
@@ -145,15 +126,10 @@ Basically the same as:
 except can be done anywhere inside git repo.
 
 _
-    args => {
-        name => {
-            summary => 'Hook name, e.g. post-commit',
-            schema => ['str*', match => '\A[A-Za-z0-9-]+\z'],
-            req => 1,
-            pos => 0,
-        },
-    },
 };
+sub post_commit {
+    run_hook(name => 'post-commit');
+}
 
 1;
 # ABSTRACT: Day-to-day command-line utilities for git
