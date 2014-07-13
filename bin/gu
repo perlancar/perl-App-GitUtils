@@ -1,0 +1,46 @@
+#!perl
+
+# DATE
+# VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use App::GitUtils;
+use Perinci::CmdLine 1.04;
+
+my $p = '/App/GitUtils/'; # prefix
+Perinci::CmdLine->new(
+    log_any_app => 0,
+    url => $p,
+    default_subcommand => 'info',
+    subcommands => {
+        'info'        => {url => '${p}info'},
+        'run-hook'    => {url => '${p}run_hook'},
+        'rh'          => {url => '${p}run_hook',
+                          summary => 'Alias for run-hook'},
+        'post-commit' => {url => '${p}post_commit'},
+        'pc'          => {url => '${p}post_commit',
+                          summary => 'Alias for post-commit'},
+    },
+)->run;
+
+# ABSTRACT: Day-to-day command-line utilities for git
+# PODNAME: gu
+
+=head1 SYNOPSIS
+
+List subcommands:
+
+ % gu --subcommands
+
+To activate bash completion:
+
+ % complete -C gu gu; # can be put in bash startup file e.g. .bashrc
+ % gu <tab>
+ % gu run-hook <tab>
+
+For help:
+
+ % gu --help
