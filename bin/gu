@@ -8,13 +8,12 @@ use strict;
 use warnings;
 
 use App::GitUtils;
-use Perinci::CmdLine 1.04;
+use Perinci::CmdLine::Lite;
 
 my $p = '/App/GitUtils/'; # prefix
-Perinci::CmdLine->new(
+Perinci::CmdLine::Lite->new(
     log_any_app => 0,
     url => $p,
-    #default_subcommand => 'info', doesn't work yet
     subcommands => {
         'info'        => {url => "${p}info"},
         'run-hook'    => {url => "${p}run_hook"},
@@ -22,6 +21,8 @@ Perinci::CmdLine->new(
                           summary => 'Alias for run-hook'},
         'post-commit' => {url => "${p}post_commit"},
     },
+    default_subcommand => 'info',
+    get_subcommand_from_arg => 2,
 )->run;
 
 # ABSTRACT: Day-to-day command-line utilities for git
@@ -45,6 +46,15 @@ For help:
 
 
 =head1 SUBCOMMANDS
+
+=head2 info
+
+This is the default subcommand when no subcommand is specified.
+
+ % gu
+ % gu info
+
+It displays repo information (currently only C<.git> location).
 
 =head2 run-hook (alias: rh)
 
