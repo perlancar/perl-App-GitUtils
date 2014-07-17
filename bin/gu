@@ -12,7 +12,6 @@ use Perinci::CmdLine::Lite;
 
 my $p = '/App/GitUtils/'; # prefix
 Perinci::CmdLine::Lite->new(
-    log_any_app => 0,
     url => $p,
     subcommands => {
         'info'        => {url => "${p}info"},
