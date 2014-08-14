@@ -8,10 +8,10 @@ use strict;
 use warnings;
 
 use App::GitUtils;
-use Perinci::CmdLine::Lite;
+use Perinci::CmdLine::Any -prefer_lite=>1;
 
 my $p = '/App/GitUtils/'; # prefix
-Perinci::CmdLine::Lite->new(
+Perinci::CmdLine::Any->new(
     url => $p,
     subcommands => {
         'info'        => {url => "${p}info"},
