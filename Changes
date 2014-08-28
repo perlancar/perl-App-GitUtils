@@ -1,5 +1,10 @@
 Revision history for App-GitUtils
 
+0.04     2014-08-28 (PERLANCAR)
+
+         - Add subcommand: pre-commit.
+
+
 0.03     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
 
          - Use Perinci::CmdLine::Any.
