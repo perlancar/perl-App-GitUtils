@@ -131,6 +131,23 @@ sub post_commit {
     run_hook(name => 'post-commit');
 }
 
+$SPEC{pre_commit} = {
+    v => 1.1,
+    summary => 'Run pre-commit hook',
+    description => <<'_',
+
+Basically the same as:
+
+    % .git/hooks/pre-commit
+
+except can be done anywhere inside git repo.
+
+_
+};
+sub pre_commit {
+    run_hook(name => 'pre-commit');
+}
+
 1;
 # ABSTRACT: Day-to-day command-line utilities for git
 

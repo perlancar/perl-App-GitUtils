@@ -19,6 +19,7 @@ Perinci::CmdLine::Any->new(
         'rh'          => {url => "${p}run_hook",
                           summary => 'Alias for run-hook'},
         'post-commit' => {url => "${p}post_commit"},
+        'pre-commit'  => {url => "${p}pre_commit"},
     },
     default_subcommand => 'info',
     get_subcommand_from_arg => 2,
@@ -74,5 +75,13 @@ except they can be run anywhere inside the repo, and can use tab completion.
 is shortcut for:
 
  % gu run-hook post-commit
+
+=head2 pre-commit
+
+ % gu pre-commit
+
+is shortcut for:
+
+ % gu run-hook pre-commit
 
 =head2 info
