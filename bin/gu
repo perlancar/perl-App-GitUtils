@@ -30,12 +30,6 @@ Perinci::CmdLine::Any->new(
 
 =head1 SYNOPSIS
 
-To activate bash completion:
-
- % complete -C gu gu; # can be put in bash startup file e.g. .bashrc
- % gu <tab>
- % gu run-hook <tab>
-
 To list available subcommands:
 
  % gu --subcommands
