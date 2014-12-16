@@ -25,7 +25,7 @@ Perinci::CmdLine::Any->new(
     get_subcommand_from_arg => 2,
 )->run;
 
-# ABSTRACT: Day-to-day command-line utilities for git
+# ABSTRACT:
 # PODNAME:
 
 =head1 SYNOPSIS

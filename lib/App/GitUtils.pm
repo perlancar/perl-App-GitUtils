@@ -12,6 +12,11 @@ use File::chdir;
 
 our %SPEC;
 
+$SPEC{':package'} = {
+    v => 1.1,
+    summary => 'Day-to-day command-line utilities for git',
+};
+
 our $_complete_hook = sub {
     my %args = @_;
 
@@ -149,7 +154,7 @@ sub pre_commit {
 }
 
 1;
-# ABSTRACT: Day-to-day command-line utilities for git
+# ABSTRACT:
 
 =head1 SYNOPSIS
 
