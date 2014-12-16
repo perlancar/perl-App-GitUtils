@@ -26,7 +26,7 @@ Perinci::CmdLine::Any->new(
 )->run;
 
 # ABSTRACT: Day-to-day command-line utilities for git
-# PODNAME: gu
+# PODNAME:
 
 =head1 SYNOPSIS
 
