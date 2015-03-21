@@ -160,14 +160,19 @@ sub pre_commit {
 
 This distribution provides the following command-line utilities:
 
- gu
+#INSERT_EXECS_LIST
 
 These utilities provide some shortcuts and tab completion to make it more
 convenient when working with git con the command-line.
 
-More utilities will be added in the future.
+
+=head1 FAQ
+
+#INSERT_BLOCK: App::PMUtils faq
 
 
 =head1 SEE ALSO
+
+#INSERT_BLOCK: App::PMUtils see_also
 
 =cut
