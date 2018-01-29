@@ -52,8 +52,12 @@ sub info {
     return [412, "Can't find .git dir, make sure you're inside a git repo"]
         unless defined $git_dir;
 
+    my ($repo_name) = $git_dir =~ m!.+/(.+)/\.git\z!
+        or return [500, "Can't extract repo name from git dir '$git_dir'"];
+
     [200, "OK", {
         git_dir => $git_dir,
+        repo_name => $repo_name,
         # more information in the future
     }];
 }
