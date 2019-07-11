@@ -1,9 +1,9 @@
-0.07    2018-01-30 (PERLANCAR)
+0.07    2018-01-30  Released-By: PERLANCAR
 
 	- info: Return repo_name.
 
 
-0.06    2015-09-03 (PERLANCAR)
+0.06    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -12,7 +12,7 @@
 	  requirement.
 
 
-0.05    2015-03-21 (PERLANCAR)
+0.05    2015-03-21  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -20,7 +20,7 @@
 	  & See Also, remove some manual doc.
 
 
-0.04     2014-08-28 (PERLANCAR)
+0.04     2014-08-28  Released-By: PERLANCAR
 
          - Add subcommand: pre-commit.
 
@@ -30,12 +30,12 @@
          - Use Perinci::CmdLine::Any.
 
 
-0.02     2014-07-18 (SHARYANTO)
+0.02     2014-07-18  Released-By: SHARYANTO
 
          - Switch from Perinci::CmdLine to Perinci::CmdLine::Lite for faster tab
            completion.
 
 
-0.01     2014-07-13 (SHARYANTO)
+0.01     2014-07-13  Released-By: SHARYANTO
 
          - First release.
