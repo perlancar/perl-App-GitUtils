@@ -1,6 +1,8 @@
 #!perl
 
+# AUTHORITY
 # DATE
+# DIST
 # VERSION
 
 use 5.010;
@@ -14,12 +16,13 @@ my $p = '/App/GitUtils/'; # prefix
 Perinci::CmdLine::Any->new(
     url => $p,
     subcommands => {
-        'info'        => {url => "${p}info"},
-        'run-hook'    => {url => "${p}run_hook"},
-        'rh'          => {url => "${p}run_hook",
-                          summary => 'Alias for run-hook'},
-        'post-commit' => {url => "${p}post_commit"},
-        'pre-commit'  => {url => "${p}pre_commit"},
+        'info'           => {url => "${p}info"},
+        'run-hook'       => {url => "${p}run_hook"},
+        'rh'             => {url => "${p}run_hook",
+                             summary => 'Alias for run-hook'},
+        'post-commit'    => {url => "${p}post_commit"},
+        'pre-commit'     => {url => "${p}pre_commit"},
+        'clone-to-bare'  => {url => "${p}clone_to_bare"},
     },
     default_subcommand => 'info',
     get_subcommand_from_arg => 2,
