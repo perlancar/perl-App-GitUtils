@@ -240,7 +240,7 @@ sub clone_to_bare {
     local $CWD = $src_dir;
     IPC::System::Options::system(
         {log=>1, die=>1},
-        "git", "push", $target_dir,
+        "git", "push", "--all", $target_dir,
     );
     [200];
 }
