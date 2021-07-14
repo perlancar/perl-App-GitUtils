@@ -8,6 +8,7 @@ package App::GitUtils;
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Cwd qw(getcwd abs_path);
 use File::chdir;
@@ -71,7 +72,8 @@ sub _search_git_dir {
 
     my $res;
     while (1) {
-        do { $res = "$cwd/.git"; last } if -d ".git";
+        log_trace "Checking for .git/ in $cwd ..." if $ENV{GITUTILS_TRACE};
+        do { $res = "$cwd/.git"; last } if -d "$cwd/.git";
         chdir ".." or goto EXIT;
         $cwd =~ s!(.+)/.+!$1! or last;
     }
@@ -257,5 +259,12 @@ This distribution provides the following command-line utilities:
 These utilities provide some shortcuts and tab completion to make it more
 convenient when working with git con the command-line.
 
+
+=head1 ENVIRONMENT
+
+=head2 GITUTILS_TRACE
+
+Boolean. If set to true, will produce additional log statements using
+L<Log::ger> at the trace level.
 
 =cut
