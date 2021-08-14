@@ -267,4 +267,9 @@ convenient when working with git con the command-line.
 Boolean. If set to true, will produce additional log statements using
 L<Log::ger> at the trace level.
 
+
+=head1 SEE ALSO
+
+L<App::GitHubUtils>
+
 =cut
