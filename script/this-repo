@@ -1,0 +1,63 @@
+#!perl
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger::Screen;
+
+use App::GitUtils;
+use Cwd;
+use Getopt::Long;
+
+Getopt::Long::Configure("bundling", "no_ignore_case");
+my $quiet;
+GetOptions(
+    "quiet|q" => \$quiet,
+);
+
+my $cwd = Cwd::getcwd();
+my $res = App::GitUtils::info(dir => $cwd);
+
+if ($res->[0] == 200) {
+    print $res->[2]{repo_name}, "\n";
+} else {
+    if ($quiet) {
+    } else {
+        warn "this-repo: No git repository can be associated with current directory '$cwd'\n";
+    }
+    exit 1;
+}
+
+# ABSTRACT: Return name of git repository associated with current directory
+# PODNAME:
+
+=head1 SYNOPSIS
+
+ % pwd
+ /home/budi/perl-Foo-Bar
+
+ % this-repo
+ perl-Foo-Bar
+
+ # Will exit with code 1 and print error message to stderr when git repository cannot be determined
+ % cd /
+ % this-repo
+ this-repo: No git repository can be associated with current directory '/'
+
+ # Don't show error message when guessing is failed (just exit with code 1)
+ % this-repo -q
+ % _
+
+
+=head1 DESCRIPTION
+
+
+
+=head1 SEE ALSO
+
+L<gu>. C<this-repo> has roughly the same utility as C<gu info>.
