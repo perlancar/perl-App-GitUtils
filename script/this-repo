@@ -61,3 +61,5 @@ if ($res->[0] == 200) {
 =head1 SEE ALSO
 
 L<gu>. C<this-repo> has roughly the same utility as C<gu info>.
+
+L<this-repo-on-github> from L<App::GitHubUtils>
