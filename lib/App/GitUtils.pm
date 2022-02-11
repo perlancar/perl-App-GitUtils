@@ -1,10 +1,5 @@
 package App::GitUtils;
 
-# AUTHORITY
-# DATE
-# DIST
-# VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -12,6 +7,11 @@ use Log::ger;
 
 use Cwd qw(getcwd abs_path);
 use File::chdir;
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
 
 our %SPEC;
 
@@ -86,6 +86,18 @@ sub _search_git_dir {
 $SPEC{info} = {
     v => 1.1,
     summary => 'Return information about git repository',
+    description => <<'_',
+
+Information include:
+- Path of the git directory
+- Repository name
+- Current/active branch
+
+Will return status 412 if working directory is not inside a git repository. Will
+return status 500 on errors, e.g. if `git` command cannot recognize the
+repository.
+
+_
     args => {
         %args_common,
     },
@@ -100,9 +112,14 @@ sub info {
     my ($repo_name) = $git_dir =~ m!.+/(.+)/\.git\z!
         or return [500, "Can't extract repo name from git dir '$git_dir'"];
 
+    my $current_branch = `git branch --show-current`;
+    return [500, "Can't execute git to find out current branch: $!"] if $?;
+    chomp $current_branch;
+
     [200, "OK", {
         git_dir => $git_dir,
         repo_name => $repo_name,
+        current_branch => $current_branch,
         # more information in the future
     }];
 }
