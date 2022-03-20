@@ -101,6 +101,9 @@ _
     args => {
         %args_common,
     },
+    deps => {
+        prog => {name=>'git', min_version=>'2.22.0'}, # for --show-current option
+    },
 };
 sub info {
     my %args = @_;
@@ -129,6 +132,9 @@ $SPEC{list_hooks} = {
     summary => 'List available hooks for the repository',
     args => {
         %args_common,
+    },
+    deps => {
+        prog => 'git',
     },
 };
 sub list_hooks {
@@ -170,6 +176,9 @@ _
             pos => 0,
             completion => $_complete_hook,
         },
+    },
+    deps => {
+        prog => 'git',
     },
 };
 sub run_hook {
