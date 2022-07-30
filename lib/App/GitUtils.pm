@@ -109,12 +109,13 @@ sub info {
     my %args = @_;
 
     my $git_dir = _search_git_dir(\%args);
-    return [412, "Can't find .git dir, make sure you're inside a git repo"]
+    return [412, "Can't find .git dir, make sure ".($args{dir} // "the current directory")." is a git repo"]
         unless defined $git_dir;
 
-    my ($repo_name) = $git_dir =~ m!.+/(.+)/\.git\z!
+    my ($repo_name) = $git_dir =~ m!(?:.+/)?([^/]+)/\.git\z!
         or return [500, "Can't extract repo name from git dir '$git_dir'"];
 
+    local $CWD = $git_dir;
     my $current_branch = `git branch --show-current`;
     return [500, "Can't execute git to find out current branch: $!"] if $?;
     chomp $current_branch;
