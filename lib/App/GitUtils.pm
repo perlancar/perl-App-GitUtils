@@ -20,32 +20,32 @@ $SPEC{':package'} = {
     summary => 'Day-to-day command-line utilities for git',
 };
 
-our %argopt_dir = (
+our %argspecopt_dir = (
     dir => {
         summary => 'A directory inside git repo',
         schema => 'dirname*',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 If not specified, will assume current directory is inside git repository and
 will search `.git` upwards.
 
-_
+MARKDOWN
     },
 );
 
-our %args_common = (
-    %argopt_dir,
+our %argspecs_common = (
+    %argspecopt_dir,
 );
 
 our %arg_target_dir = (
     target_dir => {
         summary => 'Target repo directory',
         schema => 'dirname*',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 If not specified, defaults to `$repodir.bare/`.
 
-_
+MARKDOWN
     },
 );
 
@@ -86,7 +86,7 @@ sub _search_git_dir {
 $SPEC{info} = {
     v => 1.1,
     summary => 'Return information about git repository',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Information include:
 - Path of the git directory
@@ -97,9 +97,9 @@ Will return status 412 if working directory is not inside a git repository. Will
 return status 500 on errors, e.g. if `git` command cannot recognize the
 repository.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecs_common,
     },
     deps => {
         prog => {name=>'git', min_version=>'2.22.0'}, # for --show-current option
@@ -132,7 +132,7 @@ $SPEC{list_hooks} = {
     v => 1.1,
     summary => 'List available hooks for the repository',
     args => {
-        %args_common,
+        %argspecs_common,
     },
     deps => {
         prog => 'git',
@@ -159,7 +159,7 @@ sub list_hooks {
 $SPEC{run_hook} = {
     v => 1.1,
     summary => 'Run a hook',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Basically the same as:
 
@@ -167,9 +167,9 @@ Basically the same as:
 
 except can be done anywhere inside git repo and provides tab completion.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecs_common,
         name => {
             summary => 'Hook name, e.g. post-commit',
             schema => ['str*', match => '\A[A-Za-z0-9-]+\z'],
@@ -202,7 +202,7 @@ sub run_hook {
 $SPEC{post_commit} = {
     v => 1.1,
     summary => 'Run post-commit hook',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Basically the same as:
 
@@ -210,9 +210,9 @@ Basically the same as:
 
 except can be done anywhere inside git repo.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecs_common,
     },
 };
 sub post_commit {
@@ -222,7 +222,7 @@ sub post_commit {
 $SPEC{pre_commit} = {
     v => 1.1,
     summary => 'Run pre-commit hook',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Basically the same as:
 
@@ -230,9 +230,9 @@ Basically the same as:
 
 except can be done anywhere inside git repo.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecs_common,
     },
 };
 sub pre_commit {
@@ -243,7 +243,7 @@ $SPEC{clone_to_bare} = {
     v => 1.1,
     summary => 'Clone repository to a bare repository',
     args => {
-        %args_common,
+        %argspecs_common,
         %arg_target_dir,
     },
 };
