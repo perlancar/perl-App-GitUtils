@@ -412,7 +412,7 @@ sub status {
     $res;
 }
 
-$SPEC{list_large_files} = {
+$SPEC{list_committing_large_files} = {
     v => 1.1,
     summary => 'Check that added/modified files in staged/unstaged do not exceed a certain size',
     description => <<'MARKDOWN',
@@ -428,12 +428,13 @@ rejects when a file is above 100MB in size.
 MARKDOWN
     args => {
         max_size => {
-            schema => 'uint*',
+            schema => 'datasize*',
             req => 1,
+            pos => 0,
         },
     },
 };
-sub list_large_files {
+sub list_committing_large_files {
     my %args = @_;
     my $max_size = $args{max_size} or return [400, "Please specify max_size"];
 
