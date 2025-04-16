@@ -476,6 +476,10 @@ $SPEC{calc_committing_total_size} = {
     summary => 'Calculate the total sizes of files to add/delete/modify',
     description => <<'MARKDOWN',
 
+To be used in pre-commit script, for example.
+
+Some applications: Github limits commit total size to 2GB.
+
 MARKDOWN
     args => {
         include_untracked => {
