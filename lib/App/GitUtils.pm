@@ -33,11 +33,7 @@ MARKDOWN
     },
 );
 
-our %argspecs_common = (
-    %argspecopt_dir,
-);
-
-our %arg_target_dir = (
+our %argspec_target_dir = (
     target_dir => {
         summary => 'Target repo directory',
         schema => 'dirname*',
@@ -99,11 +95,14 @@ repository.
 
 MARKDOWN
     args => {
-        %argspecs_common,
+        %argspecopt_dir,
     },
     deps => {
         prog => {name=>'git', min_version=>'2.22.0'}, # for --show-current option
     },
+    tags => [
+        'find-dotgit-dir', # we accept 'dir' arg for these
+    ],
 };
 sub info {
     my %args = @_;
@@ -132,11 +131,14 @@ $SPEC{list_hooks} = {
     v => 1.1,
     summary => 'List available hooks for the repository',
     args => {
-        %argspecs_common,
+        %argspecopt_dir,
     },
     deps => {
         prog => 'git',
     },
+    tags => [
+        'find-dotgit-dir', # we accept 'dir' arg for these
+    ],
 };
 sub list_hooks {
     my %args = @_;
@@ -169,7 +171,7 @@ except can be done anywhere inside git repo and provides tab completion.
 
 MARKDOWN
     args => {
-        %argspecs_common,
+        %argspecopt_dir,
         name => {
             summary => 'Hook name, e.g. post-commit',
             schema => ['str*', match => '\A[A-Za-z0-9-]+\z'],
@@ -181,6 +183,9 @@ MARKDOWN
     deps => {
         prog => 'git',
     },
+    tags => [
+        'find-dotgit-dir', # we accept 'dir' arg for these
+    ],
 };
 sub run_hook {
     my %args = @_;
@@ -212,8 +217,11 @@ except can be done anywhere inside git repo.
 
 MARKDOWN
     args => {
-        %argspecs_common,
+        %argspecopt_dir,
     },
+    tags => [
+        'find-dotgit-dir', # we accept 'dir' arg for these
+    ],
 };
 sub post_commit {
     run_hook(name => 'post-commit');
@@ -232,8 +240,11 @@ except can be done anywhere inside git repo.
 
 MARKDOWN
     args => {
-        %argspecs_common,
+        %argspecopt_dir,
     },
+    tags => [
+        'find-dotgit-dir', # we accept 'dir' arg for these
+    ],
 };
 sub pre_commit {
     run_hook(name => 'pre-commit');
@@ -243,9 +254,12 @@ $SPEC{clone_to_bare} = {
     v => 1.1,
     summary => 'Clone repository to a bare repository',
     args => {
-        %argspecs_common,
-        %arg_target_dir,
+        %argspecopt_dir,
+        %argspec_target_dir,
     },
+    tags => [
+        'find-dotgit-dir', # we accept 'dir' arg for these
+    ],
 };
 sub clone_to_bare {
     require IPC::System::Options;
@@ -272,6 +286,234 @@ sub clone_to_bare {
         "git", "push", "--all", $target_dir,
     );
     [200];
+}
+
+$SPEC{status} = {
+    v => 1.1,
+    summary => 'Run "git status" and return information as a data structure',
+    description => <<'MARKDOWN',
+
+Currently incomplete!
+
+MARKDOWN
+    args => {
+    },
+};
+sub status {
+    require IPC::System::Options;
+
+    my %args = @_;
+
+    my $stdout;
+    IPC::System::Options::system(
+        {log=>1, die=>1, capture_stdout => \$stdout},
+        "git", "status",
+    );
+
+    my $res = [200, "OK", {}];
+    $stdout =~ /^On branch (.+)/ or do {
+        log_warn "Can't extract branch name";
+    };
+    $res->[2]{branch} = $1;
+    my @stdout_lines = split /^/m, $stdout;
+
+    LIST_STAGED:
+    {
+        my $in_staged;
+        my (@new_files, @modified, @deleted);
+        for my $line (@stdout_lines) {
+            if (!$in_staged) {
+                if ($line =~ /^Changes to be committed:/) {
+                    $in_staged = 1;
+                    next;
+                }
+            } elsif ($in_staged == 1) {
+                if ($line =~ /^\S/) {
+                    $in_staged = 2;
+                    next;
+                } elsif (my ($op, $path) = $line =~ /^\s+(new file:|modified:|deleted: )\s\s\s(.+)\R/) {
+                    if ($op eq 'new file:') {
+                        push @new_files, $path;
+                    } elsif ($op eq 'modified:') {
+                        push @modified, $path;
+                    } elsif ($op eq 'deleted: ') {
+                        push @deleted, $path;
+                    }
+                }
+            } else {
+                last;
+            }
+        }
+        $res->[2]{staged} = {
+            new_files => \@new_files,
+            modified => \@modified,
+            deleted => \@deleted,
+        };
+    } # LIST_STAGED
+
+    LIST_UNSTAGED:
+    {
+        my $in_unstaged;
+        my (@new_files, @modified, @deleted);
+        for my $line (@stdout_lines) {
+            if (!$in_unstaged) {
+                if ($line =~ /^Changes not staged for commit:/) {
+                    $in_unstaged = 1;
+                    next;
+                }
+            } elsif ($in_unstaged == 1) {
+                if ($line =~ /^\S/) {
+                    $in_unstaged = 2;
+                    next;
+                } elsif (my ($op, $path) = $line =~ /^\s+(new file:|modified:|deleted: )\s\s\s(.+)\R/) {
+                    if ($op eq 'new file:') {
+                        push @new_files, $path;
+                    } elsif ($op eq 'modified:') {
+                        push @modified, $path;
+                    } elsif ($op eq 'deleted: ') {
+                        push @deleted, $path;
+                    }
+                }
+            } else {
+                last;
+            }
+        }
+        $res->[2]{unstaged} = {
+            new_files => \@new_files,
+            modified => \@modified,
+            deleted => \@deleted,
+        };
+    } # LIST_UNSTAGED
+
+    LIST_UNTRACKED:
+    {
+        my $in_untracked;
+        my (@paths);
+        for my $line (@stdout_lines) {
+            if (!$in_untracked) {
+                if ($line =~ /^Untracked files:/) {
+                    $in_untracked = 1;
+                    next;
+                }
+            } elsif ($in_untracked == 1) {
+                if ($line =~ /^\S/) {
+                    $in_untracked = 2;
+                    next;
+                } elsif (my ($path) = $line =~ /^\t(.+)\R/) {
+                    push @paths, $path;
+                }
+            } else {
+                last;
+            }
+        }
+        $res->[2]{untracked} = \@paths;
+    } # LIST_UNTRACKED
+
+    $res;
+}
+
+$SPEC{list_large_files} = {
+    v => 1.1,
+    summary => 'Check that added/modified files in staged/unstaged do not exceed a certain size',
+    description => <<'MARKDOWN',
+
+Will return an enveloped result with payload true containing added/modified
+files in staged/unstaged that are larger than a certain specified `max_size`.
+
+To be used in a pre-commit script, for example.
+
+Some applications: Github for example warns when a file is above 50MB and
+rejects when a file is above 100MB in size.
+
+MARKDOWN
+    args => {
+        max_size => {
+            schema => 'uint*',
+            req => 1,
+        },
+    },
+};
+sub list_large_files {
+    my %args = @_;
+    my $max_size = $args{max_size} or return [400, "Please specify max_size"];
+
+    my $res = status();
+    return $res unless $res->[0] == 200;
+
+    my @files;
+    for my $file (
+        @{ $res->[2]{staged}{new_files} },
+        @{ $res->[2]{staged}{modified} },
+        @{ $res->[2]{unstaged}{new_files} },
+        @{ $res->[2]{unstaged}{modified} },
+    ) {
+        my $size = -s $file;
+        push @files, $file if $size > $max_size;
+    }
+    [200, "OK", \@files];
+}
+
+sub _calc_totsize_recurse {
+    require File::Find;
+
+    my $path = shift;
+    my $totsize = 0;
+
+    File::Find::find(
+        sub {
+            unless (-d $_) {
+                $totsize += -s $_;
+            }
+        },
+        $path,
+    );
+    $totsize;
+}
+
+$SPEC{calc_committing_total_size} = {
+    v => 1.1,
+    summary => 'Calculate the total sizes of files to add/delete/modify',
+    description => <<'MARKDOWN',
+
+MARKDOWN
+    args => {
+        include_untracked => {
+            schema => 'bool*',
+            default => 1,
+        },
+    },
+};
+sub calc_committing_total_size {
+    my %args = @_;
+    my $include_untracked = $args{include_untracked} // 1;
+
+    my $res = status();
+    return $res unless $res->[0] == 200;
+
+    # TODO: calculate deleted
+
+    my $totsize = 0;
+    for my $file (
+        @{ $res->[2]{staged}{new_files} },
+        @{ $res->[2]{staged}{modified} },
+        @{ $res->[2]{unstaged}{new_files} },
+        @{ $res->[2]{unstaged}{modified} },
+    ) {
+        my $size = -s $file;
+        $totsize += $size;
+    }
+
+    if ($include_untracked) {
+        for my $file (@{ $res->[2]{untracked} }) {
+            if ($file =~ m!/\z!) {
+                $totsize += _calc_totsize_recurse($file);
+            } else {
+                $totsize += -s $file;
+            }
+        }
+    }
+
+    [200, "OK", $totsize];
 }
 
 1;
