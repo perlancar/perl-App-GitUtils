@@ -7,6 +7,7 @@ use Log::ger;
 
 use Cwd qw(getcwd abs_path);
 use File::chdir;
+use IPC::System::Options 'system', -log=>1, -die=>1;
 
 # AUTHORITY
 # DATE
@@ -626,7 +627,21 @@ sub split_commit_add_untracked {
     return [500, "Can't pack_bins(): $res_pack->[0] - $res_pack->[1]"]
         unless $res_pack->[0] == 200;
 
-    $res_pack;
+    # TODO: split 'git add' if there are many files
+    my $i = 0;
+    my $num_bins = @{ $res_pack->[2] };
+    for my $bin (@{ $res_pack->[2] }) {
+        $i++;
+        my @files;
+        for my $item (@{ $bin->{items} }) {
+            push @files, $item->{label};
+        }
+        system("git", "add", @files);
+
+        # TODO: let user customize commit message
+        system("git", "commit", "-m", "Commited by gu split-commit-add-untracked #$i/$num_bins");
+    }
+    [200, "OK"];
 }
 
 

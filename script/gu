@@ -31,6 +31,7 @@ Perinci::CmdLine::Any->new(
     },
     default_subcommand => 'info',
     get_subcommand_from_arg => 2,
+    log => 1,
 )->run;
 
 # ABSTRACT:
