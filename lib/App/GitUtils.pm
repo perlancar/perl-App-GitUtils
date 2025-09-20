@@ -431,6 +431,7 @@ MARKDOWN
             schema => 'datasize*',
             req => 1,
             pos => 0,
+            cmdline_aliases => {s=>{}},
         },
     },
 };
@@ -454,32 +455,6 @@ sub list_committing_large_files {
     [200, "OK", \@files];
 }
 
-$SPEC{du_untracked_files} = {
-    v => 1.1,
-    summary => 'Check the disk usage of untracked files',
-    description => <<'MARKDOWN',
-
-This routine basically just grabs the list of untracked files returned by
-`status()` (`gu status`) then checks their disk usage and totals them. CAVEAT:
-currently, if an untracked file is a directory, then this routine will just
-count the disk usage of the content of the directory recursively /without/
-considering ignored files. Correcting this is in the todo list.
-
-MARKDOWN
-    args => {
-    },
-};
-sub du_untracked_files {
-    my %args = @_;
-
-    my $res = status();
-    return $res unless $res->[0] == 200;
-
-    my $usage = 0;
-
-    [200, "OK", $usage];
-}
-
 sub _calc_totsize_recurse {
     require File::Find;
 
@@ -495,6 +470,51 @@ sub _calc_totsize_recurse {
         $path,
     );
     $totsize;
+}
+
+$SPEC{calc_untracked_total_size} = {
+    v => 1.1,
+    summary => 'Check the disk usage of untracked files',
+    description => <<'MARKDOWN',
+
+This routine basically just grabs the list of untracked files returned by
+`status()` (`gu status`) then checks their disk usage and totals them. CAVEAT:
+currently, if an untracked file is a directory, then this routine will just
+count the disk usage of the content of the directory recursively /without/
+considering ignored files. Correcting this is in the todo list.
+
+MARKDOWN
+    args => {
+        detail => {
+            schema => 'bool*',
+            cmdline_aliases => {l=>{}},
+        },
+    },
+};
+sub calc_untracked_total_size {
+    my %args = @_;
+
+    my $res = status();
+    return $res unless $res->[0] == 200;
+
+    my $totsize = 0;
+    my %sizes = 0;
+    for my $file (@{ $res->[2]{untracked} }) {
+        my $size;
+        if ($file =~ m!/\z!) {
+            $size += _calc_totsize_recurse($file);
+        } else {
+            $size += -s $file;
+        }
+        $totsize += $size;
+        if ($args{detail}) {
+            $sizes{$file} = $size;
+        }
+    }
+
+    [200, "OK", $totsize, {
+        ($args{detail} ? ('func.detail' => \%sizes) : ())
+    }];
 }
 
 $SPEC{calc_committing_total_size} = {
