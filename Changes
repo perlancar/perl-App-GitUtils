@@ -1,3 +1,10 @@
+0.088   2025-09-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Add gu subcommand: split-commit-add-untracked.
+
+        - Add logging options to `gu`.
+
+
 0.088   2025-09-20  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         [INCOMPATIBLE CHANGES]
