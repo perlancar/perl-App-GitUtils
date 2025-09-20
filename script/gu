@@ -27,6 +27,7 @@ Perinci::CmdLine::Any->new(
         'du-untracked'   => {url => "${p}calc_untracked_total_size"},
         'du-committing'  => {url => "${p}calc_committing_total_size"},
         'ls-committing-large' => {url => "${p}list_committing_large_files"},
+        'split-commit-add-untracked' => {url => "${p}split_commit_add_untracked"},
     },
     default_subcommand => 'info',
     get_subcommand_from_arg => 2,

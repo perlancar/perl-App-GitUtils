@@ -565,6 +565,71 @@ sub calc_committing_total_size {
     [200, "OK", $totsize];
 }
 
+$SPEC{split_commit_add_untracked} = {
+    v => 1.1,
+    summary => 'Commit untracked files, possibly over several commits, keeping commit size under certain limit',
+    description => <<'MARKDOWN',
+
+
+MARKDOWN
+    args => {
+        max_size => {
+            schema => 'datasize*',
+            default => 2*1024*1024*1024 - 1*1024*1024, # 1MB safe margin
+            pos => 0,
+            cmdline_aliases => {s=>{}},
+        },
+    },
+    features => {
+        dry_run => 1,
+    },
+};
+sub split_commit_add_untracked {
+    my %args = @_;
+    my $max_size = $args{max_size} // 2*1024*1024*1024 - 1*1024*1024;
+
+    my $res_status = status();
+    return [500, "Can't status(): $res_status->[0] - $res_status->[1]"]
+        unless $res_status->[0] == 200;
+
+    return [304, "Nothing to commit"]
+        unless @{ $res_status->[2]{untracked} };
+    return [409, "Please make we are not committing anything yet"]
+        if (
+            @{ $res_status->[2]{staged}{deleted} } ||
+            @{ $res_status->[2]{staged}{modified} } ||
+            @{ $res_status->[2]{staged}{new_files} } ||
+            @{ $res_status->[2]{unstaged}{deleted} } ||
+            @{ $res_status->[2]{unstaged}{modified} } ||
+            @{ $res_status->[2]{unstaged}{new_files} }
+        );
+
+    my @items;
+    for my $file (@{ $res_status->[2]{untracked} }) {
+        my $size;
+        if ($file =~ m!/\z!) {
+            $size = _calc_totsize_recurse($file);
+        } else {
+            $size = -s $file;
+        }
+        if ($size > $max_size) {
+            return [412, "One file is larger than max_size ($max_size): $file ($size)"];
+        }
+        push @items, [$file, $size];
+    }
+
+    require App::BinPackUtils;
+    my $res_pack = App::BinPackUtils::pack_bins(
+        bin_size => $max_size,
+        items => \@items,
+    );
+    return [500, "Can't pack_bins(): $res_pack->[0] - $res_pack->[1]"]
+        unless $res_pack->[0] == 200;
+
+    $res_pack;
+}
+
+
 1;
 # ABSTRACT:
 
