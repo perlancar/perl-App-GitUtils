@@ -498,7 +498,7 @@ sub calc_untracked_total_size {
     return $res unless $res->[0] == 200;
 
     my $totsize = 0;
-    my %sizes = 0;
+    my %sizes;
     for my $file (@{ $res->[2]{untracked} }) {
         my $size;
         if ($file =~ m!/\z!) {
