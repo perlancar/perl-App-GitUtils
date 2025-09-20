@@ -498,7 +498,7 @@ sub calc_untracked_total_size {
     return $res unless $res->[0] == 200;
 
     my $totsize = 0;
-    my %sizes;
+    my @sizes;
     for my $file (@{ $res->[2]{untracked} }) {
         my $size;
         if ($file =~ m!/\z!) {
@@ -508,13 +508,11 @@ sub calc_untracked_total_size {
         }
         $totsize += $size;
         if ($args{detail}) {
-            $sizes{$file} = $size;
+            push @sizes, [$file, $size];
         }
     }
 
-    [200, "OK", $totsize, {
-        ($args{detail} ? ('func.detail' => \%sizes) : ())
-    }];
+    [200, "OK", $args{detail} ? \@sizes : $totsize];
 }
 
 $SPEC{calc_committing_total_size} = {
