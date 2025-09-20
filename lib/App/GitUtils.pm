@@ -290,7 +290,7 @@ sub clone_to_bare {
 
 $SPEC{status} = {
     v => 1.1,
-    summary => 'Run "git status" and return information as a data structure',
+    summary => 'Run `git status` and return information as a data structure',
     description => <<'MARKDOWN',
 
 Currently incomplete!
@@ -452,6 +452,32 @@ sub list_committing_large_files {
         push @files, $file if $size > $max_size;
     }
     [200, "OK", \@files];
+}
+
+$SPEC{du_untracked_files} = {
+    v => 1.1,
+    summary => 'Check the disk usage of untracked files',
+    description => <<'MARKDOWN',
+
+This routine basically just grabs the list of untracked files returned by
+`status()` (`gu status`) then checks their disk usage and totals them. CAVEAT:
+currently, if an untracked file is a directory, then this routine will just
+count the disk usage of the content of the directory recursively /without/
+considering ignored files. Correcting this is in the todo list.
+
+MARKDOWN
+    args => {
+    },
+};
+sub du_untracked_files {
+    my %args = @_;
+
+    my $res = status();
+    return $res unless $res->[0] == 200;
+
+    my $usage = 0;
+
+    [200, "OK", $usage];
 }
 
 sub _calc_totsize_recurse {
