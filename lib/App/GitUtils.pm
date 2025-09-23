@@ -80,6 +80,35 @@ sub _search_git_dir {
     return $res;
 }
 
+$SPEC{get_git_dir} = {
+    v => 1.1,
+    summary => 'Get the path to the .git directory',
+    description => <<'MARKDOWN',
+
+Basically just the C<git_dir> information from `gu info`. Useful in shell
+scripts.
+
+MARKDOWN
+    args => {
+        %argspecopt_dir,
+    },
+    deps => {
+        prog => {name=>'git', min_version=>'2.22.0'}, # for --show-current option
+    },
+    tags => [
+        'find-dotgit-dir', # we accept 'dir' arg for these
+    ],
+};
+sub info {
+    my %args = @_;
+
+    my $git_dir = _search_git_dir(\%args);
+    return [412, "Can't find .git dir, make sure ".($args{dir} // "the current directory")." is a git repo"]
+        unless defined $git_dir;
+
+    [200, "OK", $git_dir];
+}
+
 $SPEC{info} = {
     v => 1.1,
     summary => 'Return information about git repository',
