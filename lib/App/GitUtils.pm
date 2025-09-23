@@ -431,7 +431,6 @@ MARKDOWN
     args => {
         max_size => {
             schema => 'datasize*',
-            req => 1,
             pos => 0,
             cmdline_aliases => {s=>{}},
         },
