@@ -16,6 +16,7 @@ my $p = '/App/GitUtils/'; # prefix
 Perinci::CmdLine::Any->new(
     url => $p,
     subcommands => {
+        'dir'            => {url => "${p}get_git_dir"},
         'info'           => {url => "${p}info"},
         'status'         => {url => "${p}status"},
         'run-hook'       => {url => "${p}run_hook"},
@@ -36,3 +37,113 @@ Perinci::CmdLine::Any->new(
 
 # ABSTRACT:
 # PODNAME:
+
+=head1 EXAMPLES
+
+=head2 Getting information
+
+Get some information about the git repository:
+
+ % gu info
+ % gu ; # the default is the 'info' subcommand
+ +----------------+---------------------------------------+
+ | key            | value                                 |
+ +----------------+---------------------------------------+
+ | current_branch | master                                |
+ | git_dir        | /home/u1/repos/perl-App-GitUtils/.git |
+ | repo_name      | perl-App-GitUtils                     |
+ +----------------+---------------------------------------+
+
+Get the path to the C<.git> directory (basically, only the C<git_dir>
+information of C<gu info>):
+
+ % cd lib; # just to show that we can run 'gu' anywhere inside the repo
+ % gu dir
+
+C<git status> parsed into data structure form:
+
+ % git status
+ On branch master
+ Your branch is up to date with 'origin/master'.
+
+ Changes not staged for commit:
+   (use "git add <file>..." to update what will be committed)
+   (use "git restore <file>..." to discard changes in working directory)
+ 	modified:   lib/App/GitUtils.pm
+ 	modified:   script/gu
+
+ no changes added to commit (use "git add" and/or "git commit -a")
+
+ % gu status
+ [
+    200,
+    "OK",
+    {
+       "branch" : "master",
+       "staged" : {
+          "deleted" : [],
+          "modified" : [],
+          "new_files" : []
+       },
+       "unstaged" : {
+          "deleted" : [],
+          "modified" : [
+             "lib/App/GitUtils.pm",
+             "script/gu"
+          ],
+          "new_files" : []
+       },
+       "untracked" : []
+    },
+    {
+       "stream" : 0,
+       "title" : "gu status"
+    }
+ ]
+
+=head2 Running hooks
+
+ % gu run-hook post-commit
+ % gu rh pre-commit
+
+Some shortcuts:
+
+ % gu post-commit; # shortcut for 'gu rh post-commit'
+ % gu pre-commit;  # shortcut for 'gu rh pre-commit'
+
+=head2 Cloning
+
+ % gu clone-to-bare
+
+Deprecated. Basically just C<git clone --bare>.
+
+=head2 Subcommand: ls-committing-large
+
+This subcommand lists large files that are being committed. You can do something
+like this in a `pre-commit` Bash script hook, for example:
+
+ # GitHub rejects files over 100MB
+ if [[ `gu ls-committing-large 100MB` != "" ]]; then
+   echo "Cancelling commit, there are files that will be rejected by GitHub"
+   exit 1
+ fi
+
+=head2 Subcommand: du-committing
+
+Calculate the size of the commit. You can do something like this in a
+`pre-commit` Bash script hook, for example:
+
+ # GitHub rejects commit size over 2GB
+ if [[ `gu du-committing` > $[2*1024*1024*1024] ]]; then
+   echo "Cancelling commit, too large, will be rejected by GitHub"
+   exit 1
+ fi
+
+=head2 Subcommand: split-commit-add-untracked
+
+If you have untracked files with a total size of larger than 2GB, you can split
+the commit using this subcommand:
+
+ % gu split-commit-add-untracked
+
+=cut
