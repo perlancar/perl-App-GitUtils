@@ -99,7 +99,7 @@ MARKDOWN
         'find-dotgit-dir', # we accept 'dir' arg for these
     ],
 };
-sub info {
+sub get_git_dir {
     my %args = @_;
 
     my $git_dir = _search_git_dir(\%args);
