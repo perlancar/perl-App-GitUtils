@@ -460,6 +460,7 @@ MARKDOWN
     args => {
         max_size => {
             schema => 'datasize*',
+            default => 100*1024*1024 - 1*1024, # safe margin
             pos => 0,
             cmdline_aliases => {s=>{}},
         },
