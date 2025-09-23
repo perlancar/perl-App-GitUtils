@@ -18,7 +18,7 @@ our %SPEC;
 
 $SPEC{':package'} = {
     v => 1.1,
-    summary => 'Day-to-day command-line utilities for git',
+    summary => 'Some additional command-line utilities for git',
 };
 
 our %argspecopt_dir = (
@@ -86,6 +86,7 @@ $SPEC{info} = {
     description => <<'MARKDOWN',
 
 Information include:
+
 - Path of the git directory
 - Repository name
 - Current/active branch
