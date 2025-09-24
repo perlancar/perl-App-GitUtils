@@ -130,8 +130,18 @@ like this in a `pre-commit` Bash script hook, for example:
 
 =head2 Subcommand: du-committing
 
-Calculate the size of the commit. You can do something like this in a
-`pre-commit` Bash script hook, for example:
+Calculate the size of the commit.
+
+ % gu du-committing
+ 271205519
+
+ % gu du-committing | datasize-to-metric
+ 258.6MB
+
+(Note: L<datasize-to-metric> is from L<App::DataSizeSpeedUtils>).
+
+
+You can do something like this in a `pre-commit` Bash script hook, for example:
 
  # GitHub rejects commit size over 2GB
  if [[ `gu du-committing` > $[2*1024*1024*1024] ]]; then
