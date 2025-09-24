@@ -1,9 +1,10 @@
 0.090   2025-09-24  Released-By: PERLANCAR; Urgency: medium
 
-        - Add status() argument: untracked to pass to 'git status' -u option.
+        - [subcommand status] Add '--untracked' option (with shortcuts -u & -U).
+          Pass this to -u in 'git status'.
 
-        - [doc] Remove caveat about not respecting .gitignore in listing
-          untracked files since we now use -uall.
+        - [subcommand du-untracked] [doc] Remove caveat about not respecting
+          .gitignore in listing untracked files since we now use -uall.
 
         - [ux] [subcommand ls-committing-large] Add '--untracked' option (with
           shortcuts -u & -U), by default include untracked files in
