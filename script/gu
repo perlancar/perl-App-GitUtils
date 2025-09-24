@@ -119,8 +119,21 @@ Deprecated. Basically just C<git clone --bare>.
 
 =head2 Subcommand: ls-committing-large
 
-This subcommand lists large files that are being committed. You can do something
-like this in a `pre-commit` Bash script hook, for example:
+This subcommand lists large files that are being committed.
+
+ % gu ls-committing-large
+ Merriweather,Roboto.zip
+
+ % gu ls-committing-large -l
+ +-------------------------+-----------+-----------+
+ | file                    | section   | size      |
+ +-------------------------+-----------+-----------+
+ | Merriweather,Roboto.zip | untracked | 167760256 |
+ +-------------------------+-----------+-----------+
+
+ % gu ls-committing-large --exclude-untracked
+
+You can do something like this in a `pre-commit` Bash script hook, for example:
 
  # GitHub rejects files over 100MB
  if [[ `gu ls-committing-large 100MB` != "" ]]; then

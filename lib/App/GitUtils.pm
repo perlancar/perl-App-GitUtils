@@ -488,26 +488,35 @@ MARKDOWN
             cmdline_aliases => {s=>{}},
         },
         %argspecopt_include_untracked,
+        detail => {
+            schema => 'bool*',
+            cmdline_aliases => {l=>{}},
+        },
     },
 };
 sub list_committing_large_files {
     my %args = @_;
     my $max_size = $args{max_size} or return [400, "Please specify max_size"];
     my $include_untracked = $args{include_untracked} // 1;
+    my $detail = $args{detail};
 
     my $res = status(untracked => 'all');
     return $res unless $res->[0] == 200;
 
     my @files;
-    for my $file (
-        @{ $res->[2]{staged}{new_files} },
-        @{ $res->[2]{staged}{modified} },
-        @{ $res->[2]{unstaged}{new_files} },
-        @{ $res->[2]{unstaged}{modified} },
-        ( $include_untracked ? @{ $res->[2]{untracked} } : ()),
-    ) {
-        my $size = -s $file;
-        push @files, $file if $size > $max_size;
+    my %section_files = (
+        staged_new_files   => $res->[2]{staged}{new_files},
+        staged_modified    => $res->[2]{staged}{modified},
+        unstaged_new_files => $res->[2]{unstaged}{new_files},
+        unstaged_modified  => $res->[2]{unstaged}{modified},
+        ( $include_untracked ? (untracked => $res->[2]{untracked}) : () ),
+    );
+    for my $section (sort keys %section_files) {
+        for my $file (@{ $section_files{$section} }) {
+            my $size = -s $file;
+            next unless $size > $max_size;
+            push @files, $detail ? {section=>$section, file=>$file, size=>$size} : $file;
+        }
     }
     [200, "OK", \@files];
 }
