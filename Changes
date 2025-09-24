@@ -1,3 +1,11 @@
+0.091   2025-09-24  Released-By: PERLANCAR; Urgency: medium
+
+        - [subcommand ls-committing-large] Add option --detail (-l).
+
+        - [subcommand du-committing][doc][ux] Add example showing usage of
+          datasize-to-metric.
+
+
 0.090   2025-09-24  Released-By: PERLANCAR; Urgency: medium
 
         - [subcommand status] Add '--untracked' option (with shortcuts -u & -U).
