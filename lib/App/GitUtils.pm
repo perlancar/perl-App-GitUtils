@@ -21,6 +21,14 @@ $SPEC{':package'} = {
     summary => 'Some additional command-line utilities for git',
 };
 
+our %argspecopt_human_readable = (
+    human_readable => {
+        summary => 'Print sizes in human-readable format, e.g. 1K 234M 2G',
+        schema => 'true*',
+        cmdline_aliases => {h=>{}},
+    },
+);
+
 our %argspecopt_dir = (
     dir => {
         summary => 'A directory inside git repo',
@@ -590,7 +598,8 @@ Some applications: Github limits commit total size to 2GB.
 
 MARKDOWN
     args => {
-        %argspecopt_include_untracked
+        %argspecopt_include_untracked,
+        %argspecopt_human_readable,
     },
 };
 sub calc_committing_total_size {
@@ -615,7 +624,12 @@ sub calc_committing_total_size {
         $totsize += $size // 0;
     }
 
-    [200, "OK", $totsize];
+    if ($args{human_readable}) {
+        require Number::Format::Metric;
+        [200, "OK", Number::Format::Metric::format_metric($totsize, {base=>2})];
+    } else {
+        [200, "OK", $totsize];
+    }
 }
 
 $SPEC{split_commit_add_untracked} = {
