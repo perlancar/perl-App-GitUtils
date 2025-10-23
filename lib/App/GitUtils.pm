@@ -514,7 +514,7 @@ sub list_committing_large_files {
     for my $section (sort keys %section_files) {
         for my $file (@{ $section_files{$section} }) {
             my $size = -s $file;
-            next unless $size > $max_size;
+            next unless ($size // 0) > $max_size;
             push @files, $detail ? {section=>$section, file=>$file, size=>$size} : $file;
         }
     }
@@ -570,7 +570,7 @@ sub calc_untracked_total_size {
         } else {
             $size += -s $file;
         }
-        $totsize += $size;
+        $totsize += $size // 0;
         if ($args{detail}) {
             push @sizes, [$file, $size];
         }
@@ -612,7 +612,7 @@ sub calc_committing_total_size {
         ( $include_untracked ? @{ $res->[2]{untracked} } : ()),
     ) {
         my $size = -s $file;
-        $totsize += $size;
+        $totsize += $size // 0;
     }
 
     [200, "OK", $totsize];
