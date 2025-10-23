@@ -576,7 +576,7 @@ sub calc_untracked_total_size {
             # with "git status -uall" should not happen
             $size += _calc_totsize_recurse($file);
         } else {
-            $size += -s $file;
+            $size += (-s $file) // 0;
         }
         $totsize += $size // 0;
         if ($args{detail}) {
