@@ -25,7 +25,8 @@ our %argspecopt_human_readable = (
     human_readable => {
         summary => 'Print sizes in human-readable format, e.g. 1K 234M 2G',
         schema => 'true*',
-        cmdline_aliases => {h=>{}},
+        # turn off temporarily because of conflict with common option --help (-h)
+        #cmdline_aliases => {h=>{}},
     },
 );
 
